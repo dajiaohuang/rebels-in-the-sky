@@ -169,7 +169,7 @@ mod tests {
         team_base_level: f32,
         with_fixed_stamina: Option<Skill>,
     ) -> TeamInGame {
-        let team = Team {
+        let mut team = Team {
             id: TeamId::new_v4(),
             ..Default::default()
         };
@@ -182,6 +182,7 @@ mod tests {
             if let Some(value) = with_fixed_stamina {
                 player.athletics.stamina = value;
             }
+            team.player_ids.push(player.id);
             players.insert(player.id, player);
         }
 
@@ -192,11 +193,11 @@ mod tests {
         team_base_level: f32,
         with_fixed_stamina: Option<Skill>,
     ) -> (TeamInGame, TeamInGame) {
-        let home_team = Team {
+        let mut home_team = Team {
             id: TeamId::new_v4(),
             ..Default::default()
         };
-        let away_team = Team {
+        let mut away_team = Team {
             id: TeamId::new_v4(),
             ..Default::default()
         };
@@ -214,6 +215,8 @@ mod tests {
             }
 
             away_player.id = PlayerId::new_v4();
+            home_team.player_ids.push(home_player.id);
+            away_team.player_ids.push(away_player.id);
             home_players.insert(home_player.id, home_player);
             away_players.insert(away_player.id, away_player);
         }

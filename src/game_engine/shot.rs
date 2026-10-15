@@ -863,7 +863,7 @@ mod tests {
     };
 
     fn generate_team_in_game(shoot_skill: f32, block_skill: f32) -> TeamInGame {
-        let team = Team {
+        let mut team = Team {
             id: TeamId::new_v4(),
             ..Default::default()
         };
@@ -875,6 +875,7 @@ mod tests {
             player.offense.medium_range = shoot_skill;
             player.offense.long_range = shoot_skill;
             player.defense.block = block_skill;
+            team.player_ids.push(player.id);
             players.insert(player.id, player);
         }
 

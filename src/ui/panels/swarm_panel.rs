@@ -30,7 +30,7 @@ use ratatui::{
     text::{Line, Span},
     widgets::{List, ListItem},
 };
-use ratatui_textarea::{CursorMove, TextArea};
+use ratatui_textarea::TextArea;
 use std::collections::{BTreeSet, HashMap};
 
 const EVENT_DUPLICATE_DELAY: Tick = 2 * MINUTES;
@@ -963,7 +963,17 @@ impl SwarmPanel {
                 .saturating_sub(36 + 2 + incipit_length)
                 .max(1); // 36 is left panel width, extra 2 is because of Block outside.
 
-            let text_lines = wrap_text(event.text.as_str(), message_max_length);
+            let text_lines: Vec<String> = event
+                .text
+                .split('\n')
+                .flat_map(|line| {
+                    if line.trim().is_empty() {
+                        vec![String::new()]
+                    } else {
+                        wrap_text(line, message_max_length)
+                    }
+                })
+                .collect();
             if !text_lines.is_empty() {
                 let mut lines = vec![Line::from(vec![
                     timestamp_span,
@@ -1151,8 +1161,8 @@ impl Screen for SwarmPanel {
                     message = message.replace(from, to);
                 }
 
-                self.textarea.move_cursor(CursorMove::End);
-                self.textarea.delete_line_by_head();
+                self.textarea.select_all();
+                self.textarea.delete_next_char();
 
                 let timestamp = Tick::now();
                 return Some(UiCallback::SendMessage { timestamp, message });
